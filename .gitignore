@@ -1,0 +1,3 @@
+*.osm
+*.json
+.ipynb_checkpoints
