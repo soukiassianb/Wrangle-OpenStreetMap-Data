@@ -462,18 +462,18 @@ I also wonder what kind of pitches there is.
 
 
 ## Ideas for Additional improvements
-One useful improvement to this dataset could be to create a field which set what we'll call **popular tourism points**.
+One useful improvement to this dataset could be to create a field called **popular tourism points**.
 The use case for those points would be for instance to separate public amenities destined for local use (an example would be a public swimming pool mostly used by school classes) versus public amenities destined to tourism.
 
 Implementing this improvements would be quite complex for a few reasons:
 
 - First, what is "popular" is quite subjective. We would need some sort popularity threshold, or let an official and unique entity determine what to put in the category.
-- Second measuring popularity is complex, some companies like Foursquare are good at it (could we use their API to scrape data? How good is the data is beyond restaurants and bars?). It would also probably require a local expertise, so would not easily be automated at scale.
+- Second measuring popularity is complex, some companies like Foursquare are good at it (could we use their API to scrape data? How good is the data is beyond restaurants and bars?). It would also probably require a local expertise (for instance for sighseeing points), so would not easily be automated at scale.
 - Third, popularity can change, what is popular this year may not be next year. Such data would need to be updated regularly.
-
 
 ___
 
-RESSOURCES used:
+Ressources used:
 
-[http://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth](http://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth)
+- [http://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth](http://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth)
+- [MongoDB Documentation](https://docs.mongodb.com/)
