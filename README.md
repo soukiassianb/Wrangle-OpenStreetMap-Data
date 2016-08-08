@@ -279,7 +279,7 @@ def create_nested_dict(data):
 	return node
 
 def update_nested_dict(d, nested_dict):
-	""" This functions uses recursion to update nested dicts
+	""" We use recursion to update nested dicts
 		while avoiding duplicates. By looping this function over the list
 		of values extracted by create_nested_dicts we build our final valid nested dictionary.
 		Output example:
@@ -303,7 +303,6 @@ def update_nested_dict(d, nested_dict):
 	return d
 ```
 
-
 ## 3. Processing the values
 
 When auditing keys, we noticed that some of the values given in the example were formatted like this:
@@ -311,8 +310,8 @@ When auditing keys, we noticed that some of the values given in the example were
 
 Those values should be processed as a list of values. (e.g `"black;yellow;black"` -> `["black", "yellow", "black"]`).
 
-We'll split the value at the ";" character. But we need to avoid splitting valid strings using this character too.
-One way to find those is to check for of empty space characters, which a valid string most likely have.
+We'll split the value at the ";" character. But we need to avoid splitting valid strings also using this character.
+One way to find those is to check for of empty space characters, which a valid string most likely have, and that our soon-to-be lists don't.
 
 All the data from the XML file is text data, but we'll also want to convert number values to their corresponding valid python data format, namely integers and floats.
 
@@ -341,7 +340,6 @@ def process_value(value):
 	return value
 ```
 
-
 ## 4. Putting it all together
 
 1. [prepare_data_for_database.py](prepare_data_for_database.py) process the OSM file and export a cleaned JSON file.
@@ -349,14 +347,130 @@ def process_value(value):
 
 ## 5. Exploring our database
 
+### Overview statistics:
+**File sizes**:
+- `la-rochelle_france.osm`: **131.3 Mo** (Uncompressed)
+- `processed-la-rochelle_france.json` : **183 Mo**
+
+**Number of documents:**
+
 ```python
 >>> db.larochelle.find().count()
 642777
->>> db.larochelle.find({"type":"node"}).count()
-550655
->>> db.larochelle.find({"type":"way"}).count()
-92119
 ```
+
+**Number of nodes**
+
+```python
+>>> db.larochelle.find({"elem_type":"node"}).count()
+550656
+```
+
+**Number of ways**
+
+```python
+>>> db.larochelle.find({"elem_type":"way"}).count()
+92121
+```
+
+**Top 5 contributing users**
+
+```python
+>>> c = db.larochelle.aggregate([
+    {"$group":{"_id":"$user", "count":{"$sum":1}}},
+    {"$sort":{"count":-1}}, {"$limit":5}
+])
+>>> for i in c:
+        print(i)
+
+{u'count': 314974, u'_id': u'\xcbdz\xebronK'}
+{u'count': 88537, u'_id': u'aerx11'}
+{u'count': 52541, u'_id': u'Eric V'}
+{u'count': 52179, u'_id': u'PierenBot'}
+{u'count': 21934, u'_id': u'Jessy Bertrand'}
+>>>
+```
+
+**Number of restaurants:**
+
+```python
+>>> db.larochelle.find({"amenity":"restaurant"}).count()
+102
+```
+
+**Additional data exploration:**
+
+La Rochelle is quite a touristic city, let's see what kind of leisure activities it can offer:
+
+```python
+>>> query = [
+  {"$match":{"leisure":{"$exists":1}}},
+  {"$group":{"_id":"$leisure", "count":{"$sum":1}}},
+  {"$sort":{"count":-1}}, {"$limit":20}
+]
+>>> for el in db.larochelle.aggregate(query):
+...     print(el)
+...
+{u'_id': u'swimming_pool', u'count': 948}
+{u'_id': u'pitch', u'count': 176}
+{u'_id': u'park', u'count': 55}
+{u'_id': u'sports_centre', u'count': 21}
+{u'_id': u'playground', u'count': 14}
+{u'_id': u'track', u'count': 13}
+{u'_id': u'marina', u'count': 8}
+{u'_id': u'garden', u'count': 5}
+{u'_id': u'slipway', u'count': 5}
+{u'_id': u'common', u'count': 2}
+{u'_id': u'golf_course', u'count': 1}
+{u'_id': u'stadium', u'count': 1}
+{u'_id': u'merry_go_round', u'count': 1}
+{u'_id': u'picnic_table', u'count': 1}
+{u'_id': u'miniature_golf', u'count': 1}
+{u'_id': u'hackerspace', u'count': 1}
+{u'_id': u'dancing', u'count': 1}
+```
+948 swimming pools is quite an impressive number! But most of them actually seem to be private.
+```
+>>> c = db.larochelle.find({"leisure":"swimming_pool", "access":"private"})
+>>> c.count()
+910
+```
+
+I also wonder what kind of pitches there is.
+
+```python
+>>> query = [
+    {"$match": {"leisure": "pitch", "sport": {"$exists":1 }}},
+    {"$group": {"_id": "$sport", "count":{"$sum":1}}},
+    {"$sort":{"count":-1}},
+    {"$limit":10}
+]
+>>> for el in db.larochelle.aggregate(query):
+        print(el)
+
+{u'count': 61, u'_id': u'tennis'}
+{u'count': 48, u'_id': u'soccer'}
+{u'count': 11, u'_id': u'basketball'}
+{u'count': 8, u'_id': u'multi'}
+{u'count': 4, u'_id': u'team_handball'}
+{u'count': 2, u'_id': u'boules'}
+{u'count': 1, u'_id': u'land_sailing'}
+{u'count': 1, u'_id': u'baseball'}
+{u'count': 1, u'_id': u'athletics'}
+{u'count': 1, u'_id': u'table_tennis'}
+```
+
+
+## Ideas for Additional improvements
+One useful improvement to this dataset could be to create a field which set what we'll call **popular tourism points**.
+The use case for those points would be for instance to separate public amenities destined for local use (an example would be a public swimming pool mostly used by school classes) versus public amenities destined to tourism.
+
+Implementing this improvements would be quite complex for a few reasons:
+
+- First, what is "popular" is quite subjective. We would need some sort popularity threshold, or let an official and unique entity determine what to put in the category.
+- Second measuring popularity is complex, some companies like Foursquare are good at it (could we use their API to scrape data? How good is the data is beyond restaurants and bars?). It would also probably require a local expertise, so would not easily be automated at scale.
+- Third, popularity can change, what is popular this year may not be next year. Such data would need to be updated regularly.
+
 
 ___
 

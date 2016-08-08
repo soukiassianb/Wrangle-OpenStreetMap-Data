@@ -128,7 +128,7 @@ def create_nested_dict(data):
 	return node
 
 def update_nested_dict(d, nested_dict):
-	""" This functions uses recursion to update nested dicts
+	""" We use recursion to update nested dicts
 		while avoiding duplicates. By looping this function over the list
 		of values extracted by create_nested_dicts we build our final valid nested dictionary.
 		Output example:
