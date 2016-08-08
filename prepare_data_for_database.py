@@ -11,7 +11,7 @@ import os
 street_type_re = re.compile(r'([^\s]+)', re.IGNORECASE)
 
 expected_street_types = []
-with open('common_street_types.json', 'rw') as f:
+with open('files/common_street_types.json', 'rw') as f:
 	expected_street_types = [str(e.encode('utf-8')) for e in json.load(f)]
 
 def is_street_name(elem):
@@ -77,7 +77,7 @@ def process_data(osmfile):
 	nodes = []
 	for event, elem in ET.iterparse(osm_file, events=("start",)):
 		if elem.tag == "node" or elem.tag == "way":
-			node = {"type": elem.tag}
+			node = {"elem_type": elem.tag}
 			for k, v in elem.attrib.items():
 				node[k] = process_value(v)
 			for tag in elem.iter("tag"):
@@ -101,7 +101,7 @@ def process_map(file_in, pretty = False):
 		then writes a JSON file with the returned dict values.
 	"""
 	name, ext = os.path.splitext(file_in)
-	file_out = "processed-{0}.json".format(name)
+	file_out = "files/processed-{0}.json".format(name.split('/').pop())
 
 	data = process_data(file_in)
 
@@ -112,9 +112,7 @@ def process_map(file_in, pretty = False):
 			f.write(json.dumps(data) + "\n")
 
 def create_nested_dict(data):
-	"""
-		Returns a list of nested dictionaries
-		mapping only one value.
+	""" Returns a list of nested dictionaries mapping only one value.
 		[ {'seamark': {'buoy_cardinal': {'colour_pattern': 'horizontal'}}},
 		  {'seamark': {'topmark': {'shape': '2 cones base together'}}} ... ]
 	"""
@@ -130,10 +128,17 @@ def create_nested_dict(data):
 	return node
 
 def update_nested_dict(d, nested_dict):
-	"""
-		This functions uses recursion to update nested dicts
+	""" This functions uses recursion to update nested dicts
 		while avoiding duplicates. By looping this function over the list
 		of values extracted by create_nested_dicts we build our final valid nested dictionary.
+		Output example:
+	    {'seamark': {
+	    	'buoy_cardinal': {'colour_pattern': 'horizontal'},
+	    	'topmark': {
+	    		'shape': '2 cones base together'
+	    		}
+	    	}
+	    }
 	"""
 	for k, v in nested_dict.items():
 		if isinstance(d, collections.Mapping):
@@ -147,4 +152,4 @@ def update_nested_dict(d, nested_dict):
 	return d
 
 
-process_map('la-rochelle_france.osm', pretty=True)
+process_map('files/la-rochelle_france.osm', pretty=True)
