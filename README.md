@@ -1,10 +1,10 @@
 # Wrangle OpenStreetMap Data
 
 Wrangling operations on an OpenStreetMap dataset for the city of La Rochelle, France.
+
 Part of the Data Analyst Nanodegree by Udacity.
 
 I choosed to wrangle the data for the city of La Rochelle, France.
-
 The dataset is available [here.](https://mapzen.com/data/metro-extracts-old/#la-rochelle-france)
 
 I'm first going to provide a detailed walkthrough of my cleaning strategy and code.

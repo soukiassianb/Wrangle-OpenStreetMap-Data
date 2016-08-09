@@ -1,4 +1,4 @@
-*.osm
-*.json
+la-rochelle_france.osm
+processed-la-rochelle_france.json
 write_sample.py
 *.ipynb

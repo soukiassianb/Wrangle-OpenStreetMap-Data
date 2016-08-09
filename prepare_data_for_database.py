@@ -152,3 +152,4 @@ def update_nested_dict(d, nested_dict):
 
 
 process_map('files/la-rochelle_france.osm', pretty=True)
+# process_map('files/sample.osm', pretty=True)
