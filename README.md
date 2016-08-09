@@ -9,7 +9,7 @@ The dataset is available [here.](https://mapzen.com/data/metro-extracts-old/#la-
 
 I'm first going to provide a detailed walkthrough of my cleaning strategy and code.
 We'll then put the pieces together and process the dataset.
-Finally we'll explore the Mongodb database and run some queries.
+Finally we'll explore the MongoDB database and run some queries.
 
 ____
 
