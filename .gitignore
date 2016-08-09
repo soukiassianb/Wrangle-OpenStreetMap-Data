@@ -1,3 +1,4 @@
 *.osm
 *.json
-.ipynb_checkpoints
+write_sample.py
+*.ipynb
