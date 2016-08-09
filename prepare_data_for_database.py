@@ -23,8 +23,7 @@ def lowercase_list(value_list):
 corrected_mapping = {
 	"rue": "Rue",
 	"quai": "Quai",
-	"Saint": "Rue",
-	"La": "La",
+	"Saint": "Rue Saint",
 	"françois": "Rue François",
 }
 
@@ -128,7 +127,7 @@ def create_nested_dict(data):
 	return node
 
 def update_nested_dict(d, nested_dict):
-	""" We use recursion to update nested dicts
+	""" We use recursion to update a dictionary 'd' with a nested dict
 		while avoiding duplicates. By looping this function over the list
 		of values extracted by create_nested_dicts we build our final valid nested dictionary.
 		Output example:
