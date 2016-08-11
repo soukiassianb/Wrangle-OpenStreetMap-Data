@@ -18,7 +18,7 @@ def is_street_name(elem):
 	return (elem.attrib['k'] == "addr:street")
 
 def lowercase_list(value_list):
-	return(str(v).lower() for v in value_list)
+	return [str(v).lower() for v in value_list]
 
 corrected_mapping = {
 	"rue": "Rue",
